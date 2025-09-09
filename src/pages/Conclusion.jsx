@@ -416,36 +416,47 @@ const Conclusion = () => {
                       <div className="mt-6 pt-6 border-t border-gray-200 w-full">
                         <p className="text-sm font-medium text-gray-700 mb-3 text-center">Share your achievement:</p>
                         <div className="flex flex-wrap items-center justify-center gap-3">
-                          <a
-                            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center space-x-2 bg-[#1877F2] hover:bg-[#125ec0] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                            aria-label="Share on Facebook"
-                          >
-                            <FaFacebook className="w-4 h-4" />
-                            <span>Facebook</span>
-                          </a>
-                          <a
-                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I just completed the Project Manager Navigator training simulation and earned the Project Manager Navigator Expert certificate!')}&url=${encodeURIComponent(window.location.href)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center space-x-2 bg:black bg-black hover:bg-neutral-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                            aria-label="Share on X"
-                          >
-                            <FaXTwitter className="w-4 h-4" />
-                            <span>X</span>
-                          </a>
-                          <a
-                            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center space-x-2 bg-[#0A66C2] hover:bg-[#084f94] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                            aria-label="Share on LinkedIn"
-                          >
-                            <FaLinkedin className="w-4 h-4" />
-                            <span>LinkedIn</span>
-                          </a>
+                          {(() => {
+                            const simulationTitle = 'Project Manager Navigator'
+                            const certificateTitle = 'Project Manager Navigator'
+                            const shareMessage = `I just completed the ${simulationTitle} simulation and earned the ${certificateTitle} Expert certificate!`
+                            const encodedMsg = encodeURIComponent(shareMessage)
+                            const placeholderUrl = encodeURIComponent('https://ap-networks.com')
+                            return (
+                              <>
+                                <a
+                                  href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMsg}&u=${placeholderUrl}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center space-x-2 bg-[#1877F2] hover:bg-[#125ec0] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
+                                  aria-label="Share on Facebook"
+                                >
+                                  <FaFacebook className="w-4 h-4" />
+                                  <span>Facebook</span>
+                                </a>
+                                <a
+                                  href={`https://twitter.com/intent/tweet?text=${encodedMsg}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center space-x-2 bg-black hover:bg-neutral-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
+                                  aria-label="Share on X"
+                                >
+                                  <FaXTwitter className="w-4 h-4" />
+                                  <span>X</span>
+                                </a>
+                                <a
+                                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${placeholderUrl}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="inline-flex items-center space-x-2 bg-[#0A66C2] hover:bg-[#084f94] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
+                                  aria-label="Share on LinkedIn"
+                                >
+                                  <FaLinkedin className="w-4 h-4" />
+                                  <span>LinkedIn</span>
+                                </a>
+                              </>
+                            )
+                          })()}
                         </div>
                       </div>
                     </div>
