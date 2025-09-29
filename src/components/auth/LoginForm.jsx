@@ -5,35 +5,25 @@ import {useAuth} from '../../hooks/useAuth.jsx'
 import SafeIcon from '../../common/SafeIcon.jsx'
 import * as FiIcons from 'react-icons/fi'
 
-const {FiMail,FiLock,FiEye,FiEyeOff} = FiIcons
+const { FiUser, FiArrowRight } = FiIcons
 
 const LoginForm = () => {
-  const [formData,setFormData] = useState({
-    email: '',
-    password: ''
-  })
-  const [showPassword,setShowPassword] = useState(false)
+  const [fullName, setFullName] = useState('')
   const [loading,setLoading] = useState(false)
-  const {signIn,error} = useAuth()
+  const { registerUser, error } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   
   const from = location.state?.from?.pathname || '/dashboard'
 
-  const handleInputChange = (field,value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
-  }
+  const handleInputChange = (value) => setFullName(value)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     
-    const {data,error} = await signIn(formData.email,formData.password)
-    
-    if (!error && data.user) {
+    const result = registerUser(fullName.trim())
+    if (result?.data?.user) {
       navigate(from,{replace: true})
     }
     
@@ -53,8 +43,8 @@ const LoginForm = () => {
           alt="APLS Logo" 
           className="h-12 w-auto mx-auto mb-4" 
         />
-        <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-        <p className="text-gray-600">Access your Procurement Navigator training</p>
+  <h2 className="text-2xl font-bold text-gray-900">Start Simulation</h2>
+  <p className="text-gray-600">Enter your name to begin</p>
       </div>
 
       {error && (
@@ -65,78 +55,34 @@ const LoginForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+            Full Name
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SafeIcon icon={FiMail} className="h-5 w-5 text-gray-400" />
+              <SafeIcon icon={FiUser} className="h-5 w-5 text-gray-400" />
             </div>
             <input
-              id="email"
-              type="email"
+              id="fullName"
+              type="text"
               required
-              value={formData.email}
-              onChange={(e) => handleInputChange('email',e.target.value)}
+              value={fullName}
+              onChange={(e) => handleInputChange(e.target.value)}
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Enter your email"
+              placeholder="Enter your full name"
             />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-            Password
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SafeIcon icon={FiLock} className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              required
-              value={formData.password}
-              onChange={(e) => handleInputChange('password',e.target.value)}
-              className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Enter your password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
-            >
-              <SafeIcon
-                icon={showPassword ? FiEyeOff : FiEye}
-                className="h-5 w-5 text-gray-400 hover:text-gray-600"
-              />
-            </button>
           </div>
         </div>
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !fullName.trim()}
           className="w-full bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Signing In...' : 'Sign In'}
+          {loading ? 'Starting…' : 'Start Simulation'}
         </button>
       </form>
 
-      <div className="mt-6 text-center space-y-2">
-        <Link 
-          to="/forgot-password" 
-          className="text-sm text-primary-600 hover:text-primary-500"
-        >
-          Forgot your password?
-        </Link>
-        <p className="text-sm text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-primary-600 hover:text-primary-500 font-medium">
-            Sign up
-          </Link>
-        </p>
-      </div>
     </motion.div>
   )
 }

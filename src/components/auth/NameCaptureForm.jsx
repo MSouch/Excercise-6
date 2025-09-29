@@ -5,12 +5,11 @@ import { useAuth } from '../../hooks/useAuth.jsx'
 import SafeIcon from '../../common/SafeIcon.jsx'
 import * as FiIcons from 'react-icons/fi'
 
-const { FiUser, FiMail, FiArrowRight } = FiIcons
+const { FiUser, FiArrowRight } = FiIcons
 
 const NameCaptureForm = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: ''
+    fullName: ''
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
@@ -34,15 +33,6 @@ const NameCaptureForm = () => {
       newErrors.fullName = 'Please enter a valid full name'
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Please enter your email address'
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email address'
-      }
-    }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -53,7 +43,7 @@ const NameCaptureForm = () => {
 
     setLoading(true)
     try {
-      const result = registerUser(formData.fullName.trim(), formData.email.trim())
+      const result = registerUser(formData.fullName.trim())
       if (result.data.user) {
         navigate('/dashboard')
       }
@@ -78,7 +68,7 @@ const NameCaptureForm = () => {
           className="h-12 w-auto mx-auto mb-4"
         />
         <h2 className="text-2xl font-bold text-gray-900">Welcome to Project Manager Navigator</h2>
-        <p className="text-gray-600">Enter your information to begin the training simulation</p>
+  <p className="text-gray-600">Enter your name to begin the training simulation</p>
       </div>
 
       {errors.general && (
@@ -117,37 +107,11 @@ const NameCaptureForm = () => {
           </p>
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SafeIcon icon={FiMail} className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              id="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              className={`block w-full pl-10 pr-3 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.email ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder="Enter your email address"
-            />
-          </div>
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-          )}
-          <p className="mt-1 text-xs text-gray-500">
-            Used for certificate delivery and verification
-          </p>
-        </div>
+        
 
         <button
           type="submit"
-          disabled={loading || !formData.fullName.trim() || !formData.email.trim()}
+          disabled={loading || !formData.fullName.trim()}
           className="w-full bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
         >
           {loading ? (

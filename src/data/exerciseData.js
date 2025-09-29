@@ -2,7 +2,7 @@ export const exerciseContent = {
   1: {
     id: 1,
     title: "Process Group Mapping Exercise",
-    description: "Create a mapping that shows how PMI Process Groups distribute across the turnaround phases for your stakeholders:",
+  description: "Create a mapping that shows how PMI Process Groups distribute across the turnaround phases for your stakeholders.",
     fields: [
       {
         id: 'phase2_process_groups',
@@ -118,7 +118,7 @@ export const exerciseContent = {
   2: {
     id: 2,
     title: "Charter Adequacy Assessment Framework",
-    description: "Create a framework for analyzing charter adequacy that you can use on future projects:",
+  description: "Create a framework for analyzing charter adequacy that you can use on future projects.",
     fields: [
       {
         id: 'scope_boundaries_test',
@@ -228,7 +228,7 @@ export const exerciseContent = {
   3: {
     id: 3,
     title: "Integrated Planning Framework",
-    description: "Design an integration approach for complex industrial projects that ensures coordination without endless meetings:",
+  description: "Design an integration approach for complex industrial projects that ensures coordination without endless meetings.",
     fields: [
       {
         id: 'functional_input_requirements',
@@ -344,7 +344,7 @@ export const exerciseContent = {
   4: {
     id: 4,
     title: "EVM Implementation Planning",
-    description: "Design an EVM implementation approach suitable for industrial turnaround projects that balances comprehensive measurement with practical execution:",
+  description: "Design an EVM implementation approach suitable for industrial turnaround projects that balances comprehensive measurement with practical execution.",
     fields: [
       {
         id: 'organization_method',

@@ -133,7 +133,7 @@ const Dashboard=()=> {
           transition={{duration: 0.5}} 
         > 
           <h1 className="text-3xl font-bold text-gray-900 mb-2"> 
-            Welcome back,{user?.user_metadata?.full_name || user?.full_name || user?.email} 
+            Welcome back, {user?.user_metadata?.full_name || user?.full_name || user?.email} 
           </h1> 
           <p className="text-gray-600"> 
             Complete challenges in sequence to unlock the next level and master project management integration excellence 

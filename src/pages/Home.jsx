@@ -28,7 +28,7 @@ const Home = () => {
               An Interactive Learning Experience for Project Management Excellence
             </p>
             <p className="text-lg text-primary-200 mb-12 max-w-2xl mx-auto">
-              You're a Senior Planner at Gulf Coast Refinery, preparing for a major turnaround while supporting a capacity expansion project. Master the integration of PMI Process Groups with industrial planning practice through realistic scenarios.
+              You are a Senior Planner at Gulf Coast Refinery, preparing for a major turnaround while supporting a capacity expansion project. Master the integration of PMI Process Groups with industrial planning practice through realistic scenarios.
             </p>
       {user ? (
               <Link

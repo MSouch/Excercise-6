@@ -65,7 +65,7 @@ const ChallengeQuestion = ({challenge, onComplete}) => {
               <span className="text-sm">Attempts: {attempts}</span>
             </div>
           </div>
-          <h1 className="text-2xl font-bold mb-4">{`Challenge ${challenge.id}: ${challenge.title}.`}</h1>
+          <h1 className="text-2xl font-bold mb-4">{`Challenge ${challenge.id}: ${challenge.title}`}</h1>
         </div>
 
         {/* Scenario Content */}
@@ -89,7 +89,9 @@ const ChallengeQuestion = ({challenge, onComplete}) => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {Object.entries(challenge.options).map(([key, option]) => (
+            {Object.entries(challenge.options)
+              .sort(([aKey],[bKey]) => aKey.localeCompare(bKey))
+              .map(([key, option]) => (
               <motion.div
                 key={key}
                 className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
