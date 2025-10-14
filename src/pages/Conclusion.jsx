@@ -6,250 +6,32 @@ import { useProgress } from '../hooks/useProgress.jsx'
 import { useAuth } from '../hooks/useAuth.jsx'
 import SafeIcon from '../common/SafeIcon.jsx'
 import * as FiIcons from 'react-icons/fi'
-import { FaLinkedin, FaFacebook, FaXTwitter } from 'react-icons/fa6'
-import apLogo from '../assets/AP-Networks-LearningSytems-Full-DivOf (6).png'
-// Use dynamic import for jsPDF per requirements
+import { FaLinkedin, FaFacebook, FaXTwitter, FaCopy, FaCheck, FaArrowDown, FaArrowUp } from 'react-icons/fa6'
+import medallionImage from '../assets/APLS-Medallion-2025_PM.png'
 
-const { FiAward, FiDownload, FiShare2, FiHome, FiTarget, FiTrendingUp } = FiIcons
+const { FiShield, FiTarget, FiHome, FiDownload } = FiIcons
 
-const Conclusion = () => {
-  const { user } = useAuth()
-  const { progress } = useProgress()
-  const [certificateUrl, setCertificateUrl] = useState(null)
-  const [generating, setGenerating] = useState(false)
-  const [certificateGenerated, setCertificateGenerated] = useState(false)
-
-  const calculateScoreLevel = () => {
-    const { completedChallenges, totalChallenges } = progress
-    if (completedChallenges === totalChallenges) return 'Expert'
-    if (completedChallenges >= 3) return 'Proficient'
-    if (completedChallenges >= 2) return 'Developing'
-    return 'Needs Training'
-  }
-
-  const generateCertificate = async () => {
-    console.log('Starting certificate generation...')
-    setGenerating(true)
-    
-    try {
-      console.log('Creating jsPDF instance...')
-      const { jsPDF } = await import('jspdf')
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      })
-      
-      const pageWidth = pdf.internal.pageSize.getWidth()
-      const pageHeight = pdf.internal.pageSize.getHeight()
-      console.log('PDF dimensions:', { pageWidth, pageHeight })
-
-      // Background
-      pdf.setFillColor(248, 250, 252)
-      pdf.rect(0, 0, pageWidth, pageHeight, 'F')
-
-      // Main Border
-      pdf.setDrawColor(59, 130, 246)
-      pdf.setLineWidth(2)
-      pdf.rect(5, 5, pageWidth - 10, pageHeight - 10)
-
-      // Header with logo (local asset)
-      try {
-        const img = new Image()
-        img.src = apLogo
-        await new Promise((resolve) => {
-          img.onload = () => resolve()
-          img.onerror = () => resolve()
-        })
-        // Place logo top-left (slightly larger)
-        pdf.addImage(img, 'PNG', 14, 11, 44, 18)
-      } catch (e) {
-        console.warn('Logo not embedded:', e)
-        // Fallback brand text at top-left
-        pdf.setFontSize(10)
-        pdf.setTextColor(59, 130, 246)
-        pdf.setFont('helvetica', 'bold')
-        pdf.text('AP-Learning Systems', 12, 18)
-      }
-
-      // Header
-      pdf.setFontSize(28)
-      pdf.setTextColor(59, 130, 246)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('CERTIFICATE OF COMPLETION', pageWidth / 2, 30, { align: 'center' })
-
-      // Subtitle
-      pdf.setFontSize(18)
-      pdf.setTextColor(75, 85, 99)
-      pdf.setFont('helvetica', 'normal')
-      pdf.text('Project Manager Navigator Training Simulation', pageWidth / 2, 45, { align: 'center' })
-
-      // Achievement text
-      pdf.setFontSize(16)
-      pdf.setTextColor(17, 24, 39)
-      pdf.text('This certifies that', pageWidth / 2, 65, { align: 'center' })
-
-      // User name
-      const userName = user?.full_name || user?.user_metadata?.full_name || user?.email || 'Participant'
-      pdf.setFontSize(24)
-      pdf.setFont('helvetica', 'bold')
-      pdf.setTextColor(17, 24, 39)
-      pdf.text(userName, pageWidth / 2, 80, { align: 'center' })
-
-      // Achievement description
-      pdf.setFontSize(16)
-      pdf.setTextColor(75, 85, 99)
-      pdf.setFont('helvetica', 'normal')
-      pdf.text('has successfully completed the Project Manager Navigator training simulation', pageWidth / 2, 100, { align: 'center' })
-      pdf.text('and demonstrated mastery of PMI process group integration principles', pageWidth / 2, 115, { align: 'center' })
-
-      // Score level
-      pdf.setFontSize(20)
-      pdf.setTextColor(34, 197, 94)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text(`Achievement Level: ${calculateScoreLevel()}`, pageWidth / 2, 135, { align: 'center' })
-
-      // Date
-      pdf.setFontSize(14)
-      pdf.setTextColor(107, 114, 128)
-      pdf.setFont('helvetica', 'normal')
-      const date = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-      pdf.text(`Completed on ${date}`, pageWidth / 2, 155, { align: 'center' })
-
-  // Company info
-      pdf.setFontSize(16)
-      pdf.setTextColor(59, 130, 246)
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('AP-Learning Systems', pageWidth / 2, 175, { align: 'center' })
-
-      // Division text
-      pdf.setFontSize(12)
-      pdf.setTextColor(107, 114, 128)
-      pdf.setFont('helvetica', 'normal')
-      pdf.text('A Division of AP-Networks LLC', pageWidth / 2, 185, { align: 'center' })
-
-      // Completion Code - Updated to PMN0400
-      pdf.setFontSize(10)
-      pdf.setTextColor(107, 114, 128)
-      pdf.text('Completion Code: PMN0400', 15, pageHeight - 20)
-
-      // Certificate verification info
-      const userEmail = user?.email || user?.user_metadata?.email || ''
-      if (userEmail) {
-        pdf.setFontSize(8)
-        pdf.setTextColor(107, 114, 128)
-        pdf.text(`Issued to: ${userEmail}`, pageWidth - 15, pageHeight - 30, { align: 'right' })
-      }
-
-      // Copyright
-      pdf.setFontSize(8)
-      pdf.setTextColor(107, 114, 128)
-      pdf.text('© 2025 AP-Learning Systems, a Division of AP-Networks LLC - ALL RIGHTS RESERVED', pageWidth / 2, pageHeight - 10, { align: 'center' })
-
-      console.log('PDF content generated successfully')
-
-  // Save certificate
-      const pdfBlob = pdf.output('blob')
-      const url = URL.createObjectURL(pdfBlob)
-      console.log('Certificate blob created:', { size: pdfBlob.size, type: pdfBlob.type })
-
-      setCertificateUrl(url)
-      setCertificateGenerated(true)
-
-      // Save certificate info to localStorage
-  const certificateData = {
-        user_id: user?.id || 'unknown',
-        user_email: userEmail,
-        user_name: userName,
-        certificate_code: 'PMN0400',
-        score_level: calculateScoreLevel(),
-        total_score: progress.overallScore,
-        issued_at: new Date().toISOString(),
-        url: url
-      }
-      localStorage.setItem('projectManagerNavigatorCertificate', JSON.stringify(certificateData))
-      console.log('Certificate data saved to localStorage')
-
-    } catch (error) {
-      console.error('Error generating certificate:', error)
-      alert('There was an error generating your certificate. Please try refreshing the page and trying again.')
-    } finally {
-      setGenerating(false)
-    }
-  }
-
-  const downloadCertificate = () => {
-    if (certificateUrl) {
-      try {
-        const userName = user?.full_name || user?.user_metadata?.full_name || 'Participant'
-        const fileName = `Project-Manager-Navigator-Certificate-${userName.replace(/\s+/g, '-')}.pdf`
-        
-        const link = document.createElement('a')
-        link.href = certificateUrl
-        link.download = fileName
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        
-        console.log('Certificate download initiated:', fileName)
-      } catch (error) {
-        console.error('Error downloading certificate:', error)
-        alert('There was an error downloading your certificate. Please try again.')
-      }
-    } else {
-      alert('Certificate not ready. Please wait for generation to complete.')
-    }
-  }
-
-  // Check if user completed all challenges
-  const allChallengesCompleted = progress.completedChallenges === progress.totalChallenges
-
-  // Check for existing certificate in localStorage
-  useEffect(() => {
-    const existingCertificate = localStorage.getItem('projectManagerNavigatorCertificate')
-    if (existingCertificate && allChallengesCompleted) {
-      try {
-        const certData = JSON.parse(existingCertificate)
-        if (certData.user_id === user?.id && certData.url) {
-          setCertificateUrl(certData.url)
-          setCertificateGenerated(true)
-          console.log('Loaded existing certificate from localStorage')
-        }
-      } catch (error) {
-        console.error('Error loading existing certificate:', error)
-      }
-    }
-  }, [user?.id, allChallengesCompleted])
-
-  // Generate certificate when component mounts if all challenges are complete and no existing certificate
-  useEffect(() => {
-    console.log('Conclusion useEffect - Checking certificate generation conditions')
-    console.log('All challenges completed:', allChallengesCompleted)
-    console.log('Certificate generated:', certificateGenerated)
-    console.log('Currently generating:', generating)
-    console.log('User exists:', !!user)
-    
-    if (allChallengesCompleted && !certificateGenerated && !generating && user) {
-      console.log('All conditions met - generating certificate...')
-      // Add a small delay to ensure the component is fully mounted
-      setTimeout(() => {
-        generateCertificate()
-      }, 500)
-    }
-  }, [allChallengesCompleted, certificateGenerated, generating, user])
-
-  const performanceImpacts = [
+// Simulation-specific configuration
+const SIMULATION_CONFIG = {
+  name: 'Project Manager Navigator',
+  credentialTitle: 'Certified Project Manager Navigator Expert',
+  programName: 'Project Manager Navigator Training Simulation',
+  completionCode: 'PMN0400',
+  medallionImage: medallionImage,
+  
+  shareText: {
+    message: 'I just completed the Project Manager Navigator simulation and earned the Project Manager Navigator Expert certificate!',
+    hashtags: '#ProjectManagement #PMI #ProfessionalDevelopment',
+    url: 'https://ap-networks.com/learning-systems'
+  },
+  
+  performanceImpacts: [
     {
       challenge: 'Challenge 1',
       impact: 'Distinguished between PMI Process Groups and industrial phases, enabling stakeholder understanding of integrated planning approaches'
     },
     {
-      challenge: 'Challenge 2', 
+      challenge: 'Challenge 2',
       impact: 'Leveraged charter clarification to establish clear planning parameters and strengthen project foundation'
     },
     {
@@ -260,47 +42,265 @@ const Conclusion = () => {
       challenge: 'Challenge 4',
       impact: 'Established EVM systems providing objective, integrated performance visibility across all project dimensions'
     }
-  ]
+  ],
+  
+  successStatistics: {
+    introText: 'Organizations implementing project management integration approaches like yours report:',
+    metrics: [
+      { metric: '35%', label: 'Fewer scope changes during execution', direction: 'down' },
+      { metric: '25%', label: 'Improved schedule performance', direction: 'up' },
+      { metric: '40%', label: 'Better stakeholder satisfaction', direction: 'up' },
+      { metric: '50%', label: 'Reduced rework from better integration', direction: 'down' }
+    ]
+  },
+  
+  nextSteps: {
+    immediateActions: [
+      'Apply charter adequacy framework on your current project',
+      'Implement one integrated planning workshop in the next 30 days',
+      'Share PMI process group concepts with stakeholders',
+      'Begin implementing EVM for better performance visibility'
+    ],
+    continueLinks: [
+      'Pursue advanced EVM certification',
+      'Explore PMI Planning Specialist Pathway',
+      'Lead organizational integration improvement initiatives',
+      'Explore other Navigator Series training modules'
+    ]
+  }
+}
+
+const Conclusion = () => {
+  const { user } = useAuth()
+  const { progress } = useProgress()
+  const [credentialId, setCredentialId] = useState(null)
+  const [copiedShareText, setCopiedShareText] = useState(false)
+
+  const calculateScoreLevel = () => {
+    const { completedChallenges = 0, totalChallenges = 4 } = progress || {}
+    if (completedChallenges === totalChallenges) return 'Expert'
+    if (completedChallenges >= 3) return 'Proficient'
+    if (completedChallenges >= 2) return 'Developing'
+    return 'Needs Training'
+  }
+
+  const generateCredentialId = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
+  }
+
+  const copyShareText = () => {
+    const shareText = `${SIMULATION_CONFIG.shareText.message}\n\n${SIMULATION_CONFIG.shareText.hashtags}`
+    try {
+      navigator.clipboard.writeText(shareText)
+      setCopiedShareText(true)
+      setTimeout(() => setCopiedShareText(false), 2000)
+    } catch (err) {
+      alert(shareText)
+    }
+  }
+
+  const downloadMedallion = () => {
+    try {
+      const link = document.createElement('a')
+      link.href = SIMULATION_CONFIG.medallionImage
+      link.download = `APLS-${SIMULATION_CONFIG.name.replace(/\s+/g, '-')}-Medallion.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (e) {
+      console.error('Error downloading medallion', e)
+    }
+  }
+
+  useEffect(() => {
+    if (!progress) return
+    const completed = progress.completedChallenges || 0
+    const total = progress.totalChallenges || 4
+
+    if (completed === total && !credentialId) {
+      const stored = localStorage.getItem('projectManagerNavigatorCredential')
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored)
+          if (parsed?.credential_id) {
+            setCredentialId(parsed.credential_id)
+            return
+          }
+        } catch (e) {
+          // ignore and create new
+        }
+      }
+
+      const newId = generateCredentialId()
+      setCredentialId(newId)
+
+      const userName = user?.full_name || user?.user_metadata?.full_name || 'Participant'
+      const payload = {
+        user_id: user?.id || 'anonymous',
+        user_name: userName,
+        credential_id: newId,
+        score_level: calculateScoreLevel(),
+        total_score: progress.overallScore || 0,
+        issued_at: new Date().toISOString()
+      }
+
+      try {
+        localStorage.setItem('projectManagerNavigatorCredential', JSON.stringify(payload))
+      } catch (e) {
+        console.warn('Could not persist credential to localStorage', e)
+      }
+    }
+  }, [progress, credentialId, user])
 
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-success-50 to-primary-50 py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <motion.div className="text-center mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="w-20 h-20 bg-success-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <SafeIcon icon={FiAward} className="w-10 h-10 text-white" />
+              <SafeIcon icon={FiShield} className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Outstanding Achievement - Project Manager Navigator Expert!
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              You've successfully completed Project Manager Navigator and proven your mastery of PMI process group integration. Your strategic approach demonstrates the advanced capabilities that distinguish expert project planners.
-            </p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Digital Simulation Expert Credential Awarded</h1>
+            <p className="text-lg text-gray-600">{SIMULATION_CONFIG.programName}</p>
+          </motion.div>
+
+          {/* Grand Medallion Card */}
+          <motion.div 
+            className="relative bg-gradient-to-br from-white to-gray-50 rounded-2xl overflow-hidden mb-8 shadow-2xl"
+            style={{ borderWidth: '6px', borderStyle: 'solid', borderImage: 'linear-gradient(135deg, #005397 0%, #0077be 100%) 1' }}
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.1 }}
+          >
+            {/* Decorative corner accents */}
+            <div className="absolute top-0 left-0 w-32 h-32 opacity-10">
+              <div className="absolute top-0 left-0 w-full h-1 bg-[#005397]"></div>
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#005397]"></div>
+            </div>
+            <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+              <div className="absolute top-0 right-0 w-full h-1 bg-[#005397]"></div>
+              <div className="absolute top-0 right-0 w-1 h-full bg-[#005397]"></div>
+            </div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 opacity-10">
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-[#005397]"></div>
+              <div className="absolute bottom-0 left-0 w-1 h-full bg-[#005397]"></div>
+            </div>
+            <div className="absolute bottom-0 right-0 w-32 h-32 opacity-10">
+              <div className="absolute bottom-0 right-0 w-full h-1 bg-[#005397]"></div>
+              <div className="absolute bottom-0 right-0 w-1 h-full bg-[#005397]"></div>
+            </div>
+
+            <div className="relative p-12 text-center">
+              {/* Medallion Image */}
+              <div className="inline-block mb-8 relative">
+                <div className="absolute inset-0 bg-[#005397] opacity-10 rounded-full blur-2xl scale-110"></div>
+                <img src={SIMULATION_CONFIG.medallionImage} alt={`${SIMULATION_CONFIG.name} Medallion`} className="relative w-64 h-64 mx-auto drop-shadow-2xl" />
+              </div>
+
+              {/* Title & Name */}
+              <div className="mb-8">
+                <h3 className="text-3xl font-bold text-[#005397] mb-3">{SIMULATION_CONFIG.credentialTitle}</h3>
+                <p className="text-xl text-gray-700 font-semibold">{user?.full_name || user?.user_metadata?.full_name || 'Participant'}</p>
+              </div>
+
+              {/* Download Button */}
+              <div className="mb-8">
+                <button 
+                  onClick={downloadMedallion} 
+                  className="inline-flex items-center space-x-2 bg-[#005397] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#003d73] transition-all transform hover:scale-105 shadow-lg"
+                >
+                  <SafeIcon icon={FiDownload} className="w-5 h-5" />
+                  <span>Download Medallion</span>
+                </button>
+              </div>
+
+              {/* Credential Details Section */}
+              <div className="border-t-2 border-[#005397] pt-8 mb-8">
+                <h4 className="text-xl font-bold text-[#005397] mb-6 flex items-center justify-center">
+                  <SafeIcon icon={FiShield} className="w-5 h-5 mr-2" />
+                  Credential Details
+                </h4>
+                <div className="max-w-2xl mx-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <span className="text-sm text-gray-600 block mb-1">Credential Name</span>
+                      <span className="font-semibold text-gray-900">{SIMULATION_CONFIG.name}</span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <span className="text-sm text-gray-600 block mb-1">Issued By</span>
+                      <span className="font-semibold text-gray-900">AP-Learning Systems</span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <span className="text-sm text-gray-600 block mb-1">Issue Date</span>
+                      <span className="font-semibold text-gray-900">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                      <span className="text-sm text-gray-600 block mb-1">Achievement Level</span>
+                      <span className="font-semibold text-[#005397]">{calculateScoreLevel()}</span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 md:col-span-2">
+                      <span className="text-sm text-gray-600 block mb-1">Overall Score</span>
+                      <span className="font-semibold text-[#005397] text-xl">{progress?.overallScore || 0}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Share Section */}
+              <div className="border-t-2 border-[#005397] pt-8">
+                <h4 className="text-xl font-bold text-[#005397] mb-4">Share Your Achievement</h4>
+                <p className="text-gray-600 text-sm mb-6">Showcase your professional credential on social media</p>
+                <div className="flex flex-wrap justify-center gap-3 mb-4">
+                  {(() => {
+                    const shareUrl = encodeURIComponent(SIMULATION_CONFIG.shareText.url)
+                    const shareText = encodeURIComponent(`${SIMULATION_CONFIG.shareText.message}\n\n${SIMULATION_CONFIG.shareText.hashtags}`)
+                    const platforms = [
+                      { name: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`, bg: 'bg-[#0A66C2] hover:bg-[#084f94]', icon: FaLinkedin },
+                      { name: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, bg: 'bg-[#1877F2] hover:bg-[#125ec0]', icon: FaFacebook },
+                      { name: 'X', href: `https://twitter.com/intent/tweet?text=${shareText}`, bg: 'bg-black hover:bg-neutral-700', icon: FaXTwitter }
+                    ]
+                    return platforms.map(p => (
+                      <a key={p.name} href={p.href} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center space-x-2 ${p.bg} text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-all transform hover:scale-105 shadow-lg`}>
+                        <p.icon className="w-4 h-4" />
+                        <span>{p.name}</span>
+                      </a>
+                    ))
+                  })()}
+                </div>
+                <button 
+                  type="button" 
+                  onClick={copyShareText} 
+                  className="w-full max-w-md mx-auto bg-gray-100 text-gray-700 px-4 py-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2 shadow"
+                >
+                  {copiedShareText ? (<><FaCheck className="w-4 h-4 text-green-600" /><span>Copied!</span></>) : (<><FaCopy className="w-4 h-4" /><span>Copy Share Text</span></>)}
+                </button>
+                <p className="text-xs text-gray-500 mt-4"><strong>Tip:</strong> Add this credential to your LinkedIn profile under "Licenses & Certifications"</p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Performance Impact */}
-          <motion.div
+          <motion.div 
             className="bg-white rounded-lg shadow-lg p-8 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              Your Project Management Integration Impact
+              Your Performance Impact
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {performanceImpacts.map((item, index) => (
-                <motion.div
+              {SIMULATION_CONFIG.performanceImpacts.map((item, index) => (
+                <motion.div 
                   key={index}
                   className="flex items-start space-x-3"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1, duration: 0.6 }}
+                  transition={{ delay: 0.5 + index * 0.1, duration: 0.6 }}
                 >
                   <div className="w-6 h-6 bg-success-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                     <SafeIcon icon={FiTarget} className="w-3 h-3 text-white" />
@@ -328,12 +328,7 @@ const Conclusion = () => {
               Organizations implementing project management integration approaches like yours report:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { metric: '35%', label: 'Fewer scope changes during execution' },
-                { metric: '25%', label: 'Improved schedule performance' },
-                { metric: '40%', label: 'Better stakeholder satisfaction' },
-                { metric: '50%', label: 'Reduced rework from better integration' }
-              ].map((stat, index) => (
+              {SIMULATION_CONFIG.successStatistics.metrics.map((stat, index) => (
                 <motion.div
                   key={index}
                   className="text-center"
@@ -341,139 +336,17 @@ const Conclusion = () => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + index * 0.1, duration: 0.6 }}
                 >
-                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <SafeIcon icon={FiTrendingUp} className="w-6 h-6 text-primary-600" />
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 ${stat.direction === 'down' ? 'bg-success-100' : 'bg-primary-100'}`}>
+                    {stat.direction === 'down' ? (
+                      <FaArrowDown className="w-6 h-6 text-green-600" />
+                    ) : (
+                      <FaArrowUp className="w-6 h-6 text-primary-600" />
+                    )}
                   </div>
-                  <p className="text-2xl font-bold text-primary-600 mb-1">{stat.metric}</p>
+                  <p className={`text-2xl font-bold mb-1 ${stat.direction === 'down' ? 'text-green-600' : 'text-primary-600'}`}>{stat.metric}</p>
                   <p className="text-sm text-gray-600">{stat.label}</p>
                 </motion.div>
               ))}
-            </div>
-          </motion.div>
-
-          {/* Certificate Section */}
-          <motion.div
-            className="bg-white rounded-lg shadow-lg p-8 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.6 }}
-          >
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              Certificate of Mastery
-            </h2>
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-primary-500 to-success-500 rounded-lg p-6 text-white mb-6">
-                <SafeIcon icon={FiAward} className="w-12 h-12 mx-auto mb-3" />
-                <h3 className="text-xl font-bold mb-2">Certified Project Manager Navigator Expert</h3>
-                <p className="text-primary-100">
-                  Achievement Level: {calculateScoreLevel()}
-                </p>
-                <p className="text-primary-100 text-sm">
-                  Overall Score: {progress.overallScore}%
-                </p>
-                <p className="text-primary-100 text-sm mt-2">
-                  Completion Code: PMN0400
-                </p>
-                {user?.email && (
-                  <p className="text-primary-100 text-xs mt-2">
-                    Issued to: {user.email}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                {!allChallengesCompleted ? (
-                  <div className="py-4">
-                    <p className="text-gray-600 mb-4">Complete all 4 challenges to generate your certificate</p>
-                    <Link
-                      to="/dashboard"
-                      className="inline-flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
-                    >
-                      <SafeIcon icon={FiHome} className="w-4 h-4" />
-                      <span>Continue Training</span>
-                    </Link>
-                  </div>
-                ) : generating ? (
-                  <div className="flex items-center justify-center space-x-2 py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
-                    <span className="text-gray-600">Generating your certificate...</span>
-                  </div>
-                ) : certificateGenerated && certificateUrl ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center space-x-2 text-success-600 mb-4">
-                      <SafeIcon icon={FiAward} className="w-5 h-5" />
-                      <span className="font-medium">Certificate Ready!</span>
-                    </div>
-                    <div className="flex flex-col gap-4 justify-center items-center">
-                      <button
-                        onClick={downloadCertificate}
-                        className="inline-flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors shadow-lg"
-                      >
-                        <SafeIcon icon={FiDownload} className="w-4 h-4" />
-                        <span>Download Certificate</span>
-                      </button>
-                      {/* Social Share Section */}
-                      <div className="mt-6 pt-6 border-t border-gray-200 w-full">
-                        <p className="text-sm font-medium text-gray-700 mb-3 text-center">Share your achievement:</p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                          {(() => {
-                            const simulationTitle = 'Project Manager Navigator'
-                            const certificateTitle = 'Project Manager Navigator'
-                            const shareMessage = `I just completed the ${simulationTitle} simulation and earned the ${certificateTitle} Expert certificate!`
-                            const encodedMsg = encodeURIComponent(shareMessage)
-                            const placeholderUrl = encodeURIComponent('https://ap-networks.com')
-                            return (
-                              <>
-                                <a
-                                  href={`https://www.facebook.com/sharer/sharer.php?quote=${encodedMsg}&u=${placeholderUrl}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center space-x-2 bg-[#1877F2] hover:bg-[#125ec0] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                                  aria-label="Share on Facebook"
-                                >
-                                  <FaFacebook className="w-4 h-4" />
-                                  <span>Facebook</span>
-                                </a>
-                                <a
-                                  href={`https://twitter.com/intent/tweet?text=${encodedMsg}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center space-x-2 bg-black hover:bg-neutral-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                                  aria-label="Share on X"
-                                >
-                                  <FaXTwitter className="w-4 h-4" />
-                                  <span>X</span>
-                                </a>
-                                <a
-                                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${placeholderUrl}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center space-x-2 bg-[#0A66C2] hover:bg-[#084f94] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow"
-                                  aria-label="Share on LinkedIn"
-                                >
-                                  <FaLinkedin className="w-4 h-4" />
-                                  <span>LinkedIn</span>
-                                </a>
-                              </>
-                            )
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : allChallengesCompleted ? (
-                  <div className="py-4">
-                    <button
-                      onClick={generateCertificate}
-                      disabled={generating}
-                      className="inline-flex items-center space-x-2 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
-                    >
-                      <SafeIcon icon={FiAward} className="w-4 h-4" />
-                      <span>Generate Certificate</span>
-                    </button>
-                  </div>
-                ) : null}
-              </div>
             </div>
           </motion.div>
 
@@ -491,19 +364,17 @@ const Conclusion = () => {
               <div className="space-y-3">
                 <h3 className="font-semibold text-gray-900">Immediate Implementation:</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Apply charter adequacy framework on your current project</li>
-                  <li>• Implement one integrated planning workshop in the next 30 days</li>
-                  <li>• Share PMI process group concepts with stakeholders</li>
-                  <li>• Begin implementing EVM for better performance visibility</li>
+                  {SIMULATION_CONFIG.nextSteps.immediateActions.map((action, index) => (
+                    <li key={index}>• {action}</li>
+                  ))}
                 </ul>
               </div>
               <div className="space-y-3">
                 <h3 className="font-semibold text-gray-900">Professional Development:</h3>
                 <ul className="space-y-2 text-gray-600">
-                  <li>• Pursue advanced EVM certification</li>
-                  <li>• Explore PMI Planning Specialist Pathway</li>
-                  <li>• Lead organizational integration improvement initiatives</li>
-                  <li>• Explore other Navigator Series training modules</li>
+                  {SIMULATION_CONFIG.nextSteps.continueLinks.map((link, index) => (
+                    <li key={index}>• {link}</li>
+                  ))}
                 </ul>
               </div>
             </div>
