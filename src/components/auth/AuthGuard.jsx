@@ -38,9 +38,25 @@ const AuthGuard = ({ children }) => {
   }
 
   // Check conclusion access
-  if (location.pathname === '/conclusion' && progress.completedChallenges < 4) {
-    console.log(`AuthGuard: Conclusion blocked - only ${progress.completedChallenges}/4 challenges completed`)
-    return <Navigate to="/dashboard" replace />
+  if (location.pathname === '/conclusion') {
+    // Prefer freshest state from localStorage; fall back to hook state
+    let effectiveCompleted = progress?.completedChallenges ?? 0
+    try {
+      const stored = localStorage.getItem('projectManagerNavigatorProgress')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (typeof parsed?.completedChallenges === 'number') {
+          effectiveCompleted = parsed.completedChallenges
+        }
+      }
+    } catch (e) {
+      console.warn('AuthGuard: Failed reading localStorage progress, using hook state', e)
+    }
+
+    if (effectiveCompleted < 4) {
+      console.log(`AuthGuard: Conclusion blocked - only ${effectiveCompleted}/4 challenges completed`)
+      return <Navigate to="/dashboard" replace />
+    }
   }
 
   console.log('AuthGuard: Access granted for:', location.pathname)
