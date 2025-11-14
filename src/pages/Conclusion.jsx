@@ -92,14 +92,29 @@ const Conclusion = () => {
     })
   }
 
-  const copyShareText = () => {
+  const copyShareText = async () => {
     const shareText = `${SIMULATION_CONFIG.shareText.message}\n\n${SIMULATION_CONFIG.shareText.hashtags}`
     try {
-      navigator.clipboard.writeText(shareText)
+      await navigator.clipboard.writeText(shareText)
       setCopiedShareText(true)
       setTimeout(() => setCopiedShareText(false), 2000)
     } catch (err) {
-      alert(shareText)
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea')
+      textArea.value = shareText
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        setCopiedShareText(true)
+        setTimeout(() => setCopiedShareText(false), 2000)
+      } catch (e) {
+        console.error('Failed to copy text:', e)
+        alert('Share text:\n\n' + shareText)
+      }
+      document.body.removeChild(textArea)
     }
   }
 
